@@ -2,7 +2,7 @@ import pkg.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SlidePuzzle {
+public class SlidePuzzle implements InputKeyControl{
 
 	private int width, height;
 	private int[][] tiles;
@@ -15,6 +15,8 @@ public class SlidePuzzle {
 		height = h;
 		initTiles();
 		sg = new SlidePuzzleGraphics(w, h);
+
+		KeyController kC = new KeyController(Canvas.getInstance(), this);
 	}
 
 	public void initTiles ()
@@ -80,13 +82,36 @@ public class SlidePuzzle {
 		return points;
 	}
 
-	// public int getTotalPoints (int x, int y)
-	// {
-	// 	int total = 4;
-	// 	if (x == 0 || x == width - 1) total --;
-	// 	if (y == 0 || y == height - 1) total --;
-	// 	return total;
-	// }
+	public void move (Point vector)
+	{
+		vector = new Point(-vector.getX(), -vector.getY());
+		Point emptyTile = getEmptyTile();
+
+		int n_x = vector.getX() + emptyTile.getX();
+		int n_y = vector.getY() + emptyTile.getY();
+		if (n_x < 0 || n_x >= width) return;
+		if (n_y < 0 || n_y >= height) return;
+
+		tiles[emptyTile.getY()][emptyTile.getX()] = tiles[n_y][n_x];
+		tiles[n_y][n_x] = (width * height - 1);
+		// sg.move(emptyTile, vector);
+	}
+
+	public void keyPress (String s)
+	{
+		if (s.equalsIgnoreCase("w")) {
+			move(new Point(0, -1));
+		} else if (s.equalsIgnoreCase("s")) {
+			move(new Point(0, 1));
+		} else if (s.equalsIgnoreCase("a")) {
+			move(new Point(-1, 0));
+		} else if (s.equalsIgnoreCase("d")) {
+			move(new Point(1, 0));
+		}
+		// print();
+	}
+
+	public void keyRelease (String s){}
 
 	public void print ()
 	{

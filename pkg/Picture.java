@@ -1,6 +1,7 @@
 //HIDE
 package pkg;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -23,8 +24,8 @@ public class Picture implements Shape
     private String source;
     private double x;
     private double y;
-    private double xGrow;
-    private double yGrow;
+    private double xGrow = 1;
+    private double yGrow = 1;
 
     /**
      * Constructs a picture with no image.
@@ -88,7 +89,7 @@ public class Picture implements Shape
      */
     public int getX()
     {
-       return (int) Math.round(x - xGrow);
+       return (int) Math.round(x);
     }
 
     /**
@@ -97,7 +98,7 @@ public class Picture implements Shape
      */
     public int getY()
     {
-       return (int) Math.round(y - yGrow);
+       return (int) Math.round(y);
     }
 
     /**
@@ -124,7 +125,7 @@ public class Picture implements Shape
     public int getWidth()
     {
        return (int) Math.round(
-          (image == null ? 0 : image.getWidth()) + 2 * xGrow);
+          (image == null ? 0 : image.getWidth()) * xGrow);
     }
 
     /**
@@ -133,7 +134,7 @@ public class Picture implements Shape
     public int getHeight()
     {
        return (int) Math.round(
-          (image == null ? 0 : image.getHeight()) + 2 * yGrow);
+          (image == null ? 0 : image.getHeight()) * yGrow);
     }
 
     /**
@@ -279,8 +280,8 @@ public class Picture implements Shape
      */
     public void grow(double dw, double dh)
     {
-        xGrow += dw;
-        yGrow += dh;
+        xGrow *= dw;
+        yGrow *= dh;
         Canvas.getInstance().repaint();
     }
 
@@ -296,6 +297,23 @@ public class Picture implements Shape
 	{
 		Canvas.getInstance().delete(this);
 	}
+	
+	public BufferedImage getImage ()
+	{
+		BufferedImage b = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+		Graphics g = b.getGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		return b;
+	}
+	
+	public void setImage (BufferedImage i)
+	{
+		image = i;
+		label.setIcon(new ImageIcon(image));
+        label.setText("");
+		Canvas.getInstance().repaint();
+	}
 
     /**
      * Draws this shape.
@@ -310,8 +328,10 @@ public class Picture implements Shape
             {
                 label.setBounds(0, 0, dim.width, dim.height);
                 g2.translate(getX(), getY());
-                g2.scale((image.getWidth() + 2 * xGrow) / dim.width, 
-                    (image.getHeight() + 2 * yGrow) / dim.height);
+                // g2.scale((image.getWidth() + 2 * xGrow) / dim.width, 
+						// (image.getHeight() + 2 * yGrow) / dim.height);
+				// g2.scale(image.getWidth() * xGrow / dim.width, image.getHeight() * yGrow / dim.height);
+				g2.scale(xGrow, yGrow);
                 label.paint(g2);
             }
         }

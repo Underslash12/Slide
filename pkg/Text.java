@@ -11,14 +11,14 @@ public class Text implements Shape
     private JLabel label = new JLabel();
     private double x;
     private double y;
-    private double xGrow;
-    private double yGrow;
+    private double xGrow = 1;
+    private double yGrow = 1;
 
     /**
      * Constructs a text at a given location.
      * @param x the leftmost x-position of the shape
      * @param y the topmost y-position of the shape
-     * @param message the text string 
+     * @param message the text string
      */
     public Text(double x, double y, String message)
     {
@@ -26,15 +26,15 @@ public class Text implements Shape
         this.y = y;
         label.setText(message);
     }
-    
-    
+
+
     /**
      * Gets the leftmost x-position of the bounding box.
      * @return the leftmost x-position
      */
     public int getX()
     {
-        return (int) Math.round(x - xGrow) ;
+        return (int) Math.round(x) ;
     }
 
     /**
@@ -43,17 +43,17 @@ public class Text implements Shape
      */
     public int getY()
     {
-        return (int) Math.round(y - yGrow);
+        return (int) Math.round(y);
     }
-    
-    
+
+
     /**
      * Gets the width of the bounding box.
      * @return the width
      */
     public int getWidth()
     {
-        return (int) Math.round(label.getPreferredSize().getWidth() + 2 * xGrow);
+        return (int) Math.round(label.getPreferredSize().getWidth() * xGrow);
     }
 
     /**
@@ -62,9 +62,9 @@ public class Text implements Shape
      */
     public int getHeight()
     {
-        return (int) Math.round(label.getPreferredSize().getHeight() + 2 * yGrow);
+        return (int) Math.round(label.getPreferredSize().getHeight() * yGrow);
     }
-    
+
     /**
      * Moves this text by a given amount.
      * @param dx the amount by which to move in x-direction
@@ -75,8 +75,14 @@ public class Text implements Shape
         x += dx;
         y += dy;
         Canvas.getInstance().repaint();
-    }    
-    
+    }
+
+    public void translateNoRe(double dx , double dy)
+    {
+        x += dx;
+        y += dy;
+    }
+
     /**
      * Resizes this text both horizontally and vertically.
      * @param dw the amount by which to resize the width on each side
@@ -84,8 +90,8 @@ public class Text implements Shape
      */
     public void grow(double dw, double dh)
     {
-        xGrow += dw;
-        yGrow += dh;
+        xGrow *= dw;
+        yGrow *= dh;
         Canvas.getInstance().repaint();
     }
 
@@ -106,18 +112,26 @@ public class Text implements Shape
     {
         Canvas.getInstance().show(this);
     }
-	
+
 	public void undraw()
 	{
 		Canvas.getInstance().delete(this);
 	}
-	
-   // new method added by Neato to support translating, changing Text Objects
-   public void setText(String update)
+
+    // new method added by Neato to support translating, changing Text Objects
+    public void setText(String update)
 	{
 		label.setText(update);
 		Canvas.getInstance().repaint();
 	}
+
+    public void center(Rectangle r)
+    {
+        translateNoRe(-getX(), -getY());
+        translateNoRe(r.getX(), r.getY());
+        translate((r.getWidth() - getWidth()) / 2, (r.getHeight() - getHeight()) / 2);
+    }
+
     public String toString()
     {
         return "Text[x=" + getX() + ",y=" + getY() + ",message=" + label.getText() + "]";

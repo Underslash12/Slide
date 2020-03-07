@@ -14,7 +14,12 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JOptionPane;
+
+import java.awt.BorderLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class Canvas
 {
@@ -29,8 +34,8 @@ public class Canvas
     private static final int MIN_SIZE = 100;
     private static final int MARGIN = 10;
     private static final int LOCATION_OFFSET = 120;
-	
-	//static JFrame frameC;
+
+    //static JFrame frameC;
 
     class CanvasComponent extends JComponent
     {
@@ -42,29 +47,30 @@ public class Canvas
             if (background != null)
             {
                 g.drawImage(background, 0, 0, null);
-            }               
+            }
             for (Shape s : new ArrayList<Shape>(shapes))
             {
                 Graphics2D g2 = (Graphics2D) g.create();
                 s.paintShape(g2);
                 g2.dispose();
             }
+            // System.out.println("resize");
         }
 
         public Dimension getPreferredSize()
         {
-            int maxx = MIN_SIZE;
-            int maxy = MIN_SIZE;
-            if (background != null)
-            {
-                maxx = Math.max(maxx, background.getWidth());
-                maxy = Math.max(maxx, background.getHeight());
-            }
-            for (Shape s : shapes)
-            {
-                maxx = (int) Math.max(maxx, s.getX() + s.getWidth());
-                maxy = (int) Math.max(maxy, s.getY() + s.getHeight());
-            }
+            // int maxx = MIN_SIZE;
+            // int maxy = MIN_SIZE;
+            // if (background != null)
+            // {
+            //     maxx = Math.max(maxx, background.getWidth());
+            //     maxy = Math.max(maxx, background.getHeight());
+            // }
+            // for (Shape s : shapes)
+            // {
+            //     maxx = (int) Math.max(maxx, s.getX() + s.getWidth());
+            //     maxy = (int) Math.max(maxy, s.getY() + s.getHeight());
+            // }
 			// changed by Neato to make Canvas the same size (600 x 600)
 			return new Dimension(640,640);
             //return new Dimension(maxx + MARGIN, maxy + MARGIN);
@@ -75,49 +81,80 @@ public class Canvas
     {
         component = new CanvasComponent();
 
-        if (System.getProperty("com.horstmann.codecheck") == null)
-        {
-            frame = new JFrame();
-            if (!System.getProperty("java.class.path").contains("bluej"))
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(component);
-            frame.pack();
-            //frame.setLocation(LOCATION_OFFSET, LOCATION_OFFSET);
-            frame.setVisible(true);
-        }
-        else
-        {
-            final String SAVEFILE ="canvas.png";
-            final Thread currentThread = Thread.currentThread();
-            Thread watcherThread = new Thread() 
-                {
-                    public void run()
-                    {
-                        try
-                        {
-                            final int DELAY = 10;
-                            
-                            while (currentThread.getState() != Thread.State.TERMINATED)
-                            {
-                                Thread.sleep(DELAY);
-                            }
-                            saveToDisk(SAVEFILE);
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.printStackTrace();
-                        }
-                    }
-                };
-            watcherThread.start();
-        }
+        // if (System.getProperty("com.horstmann.codecheck") == null)
+        // {
+        // JPanel panel = new JPanel() {
+        // };
+
+
+        // component.addComponentListener(new ComponentAdapter() {
+        //     @Override
+        //     public void componentResized(ComponentEvent e) {
+        //         System.out.println("Resized to " + e.getComponent().getSize());
+        //     }
+        //     @Override
+        //     public void componentMoved(ComponentEvent e) {
+        //         System.out.println("Moved to " + e.getComponent().getLocation());
+        //     }
+        // });
+
+        frame = new JFrame();
+        if (!System.getProperty("java.class.path").contains("bluej"))
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // frame.add(panel);
+        // System.out.println(frame.getBounds().getSize());
+        frame.add(component);
+        // System.out.println(frame.getContentPane().getBounds().getSize());
+        frame.setResizable(false);
+        frame.pack();
+        //frame.setLocation(LOCATION_OFFSET, LOCATION_OFFSET);
+        frame.setVisible(true);
+
+        // System.out.println(frame.getBounds().getSize());
+
+        // }
+        // else
+        // {
+        //     final String SAVEFILE ="canvas.png";
+        //     final Thread currentThread = Thread.currentThread();
+        //     Thread watcherThread = new Thread()
+        //         {
+        //             public void run()
+        //             {
+        //                 try
+        //                 {
+        //                     final int DELAY = 10;
+        //
+        //                     while (currentThread.getState() != Thread.State.TERMINATED)
+        //                     {
+        //                         Thread.sleep(DELAY);
+        //                     }
+        //                     saveToDisk(SAVEFILE);
+        //                 }
+        //                 catch (Exception ex)
+        //                 {
+        //                     ex.printStackTrace();
+        //                 }
+        //             }
+        //         };
+            // watcherThread.start();
+        // }
     }
 
     public static Canvas getInstance()
     {
         return canvas;
     }
-	
+
+    public Dimension getSize ()
+    {
+        // System.out.println(frame.getContentPane().getPreferredSize());
+        // System.out.println(component.getPreferredSize());
+        // JComponent c = frame.getContentPane().getComponents()[0];
+        // return new Dimension(c.getWidth(), c.getHeight());
+        return frame.getContentPane().getPreferredSize();
+    }
+
     public void show(Shape s)
     {
         if (!shapes.contains(s))
@@ -127,7 +164,7 @@ public class Canvas
         }
         repaint();
     }
-	
+
 	//added by stew
 	public void delete(Shape s)
 	{
@@ -138,7 +175,7 @@ public class Canvas
 		}
 		repaint();
 	}
-	
+
 	public void translateAll(double x, double y)
 	{
 		for(int s = 0; s < shapes.size(); s++){
@@ -146,7 +183,7 @@ public class Canvas
 		}
 		repaint();
 	}
-	
+
 	//added by stew
 	public void deleteCanvas()
 	{
@@ -154,7 +191,7 @@ public class Canvas
 		shapesTemp.clear();
 		repaint();
 	}
-	
+
 	//added by stew
 	public void clearCanvas()
 	{
@@ -163,7 +200,7 @@ public class Canvas
 		System.out.println("" + shapesTemp.size());
 		repaint();
 	}
-	
+
 	//added by stew
 	public void resetCanvas()
 	{
@@ -193,9 +230,9 @@ public class Canvas
      */
 	 // 10/21/18 Neato's wimpy pause is replaced by Professor Dylan's
 	 // Dylan's critique:
-	 // Using nested for loops takes up memory and cannot accurately 
+	 // Using nested for loops takes up memory and cannot accurately
 	 // pause time across different machines.
-	// Also, it did not pause for td seconds as the readme suggests, 
+	// Also, it did not pause for td seconds as the readme suggests,
 	// as it is not really feasible to accurately measure time with for loops.
 	 // public static void pause(int td)
     // {
@@ -210,7 +247,7 @@ public class Canvas
         // if (frame == null) return;
         // JOptionPane.showMessageDialog(frame, "Click Ok to continue");
     // }
-	
+
 		 public static void pause(int td) {
 	  try {
 		Thread.sleep(td);
@@ -245,8 +282,8 @@ public class Canvas
     public void saveToDisk(String fileName)
     {
         Dimension dim = component.getPreferredSize();
-    	java.awt.Rectangle rect = new java.awt.Rectangle(0, 0, dim.width, dim.height);
-    	BufferedImage image = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_RGB);
+    	  java.awt.Rectangle rect = new java.awt.Rectangle(0, 0, dim.width, dim.height);
+    	  BufferedImage image = new BufferedImage(rect.width, rect.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
         g.setColor(java.awt.Color.WHITE);
         g.fill(rect);
@@ -256,11 +293,11 @@ public class Canvas
         try
         {
             ImageIO.write(image, extension, new File(fileName));
-        } 
+        }
         catch(IOException e)
         {
             System.err.println("Was unable to save the image to " + fileName);
         }
-    	g.dispose();    	
+        g.dispose();
     }
 }
