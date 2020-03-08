@@ -8,10 +8,11 @@ public class Main { // implements InputControl, InputKeyControl{
 		// KeyController kC = new KeyController(Canvas.getInstance(), new Main());
 
 		SlidePuzzle s = new SlidePuzzle(4, 4);
-		s.print();
-		s.move(new Point(0, -1));
-		// s.shuffle(1);
-		s.print();
+		SlidePuzzleGraphics sg;
+		// s.print();
+		// s.move(new Point(0, -1));
+		s.shuffle(1000);
+		// s.print();
 		// s.shuffle(1000);
 		// s.print();
 	}
