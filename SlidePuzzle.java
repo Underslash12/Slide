@@ -39,6 +39,7 @@ public class SlidePuzzle implements InputKeyControl{
 	public void shuffle (int times)
 	{
 		resetTimer();
+		// Canvas.pause(100);
 		for (int i = 0; i < times; i++) {
 			makeRandomMove();
 		}
@@ -168,6 +169,8 @@ public class SlidePuzzle implements InputKeyControl{
 
 	public void resetTimer ()
 	{
+		stopTimer();
+		Canvas.pause(100);
 		sg.setTimer(0);
 		stop = false;
 	}
