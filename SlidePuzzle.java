@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.Thread;
 
+import static java.lang.Math.toIntExact;
+
 public class SlidePuzzle implements InputKeyControl{
 
 	private int width, height;
@@ -10,6 +12,9 @@ public class SlidePuzzle implements InputKeyControl{
 
 	private SlidePuzzleGraphics sg;
 	private boolean canMove = true;
+	private boolean hasMoved = false;
+
+	private boolean stop = false;
 
 	public SlidePuzzle (int w, int h)
 	{
@@ -33,10 +38,12 @@ public class SlidePuzzle implements InputKeyControl{
 
 	public void shuffle (int times)
 	{
+		resetTimer();
 		for (int i = 0; i < times; i++) {
 			makeRandomMove();
 		}
 		sg.move(0, new Point(0, 0), true);
+		hasMoved = false;
 	}
 
 	public void makeRandomMove ()
@@ -86,8 +93,18 @@ public class SlidePuzzle implements InputKeyControl{
 		return points;
 	}
 
+	public SlidePuzzleGraphics getGraphics ()
+	{
+		return sg;
+	}
+
 	public void move (Point v)
 	{
+		if (!hasMoved) {
+			startTimer();
+			hasMoved = true;
+		}
+
 		canMove = false;
 		Point vector = new Point(-v.getX(), -v.getY());
 		Point emptyTile = getEmptyTile();
@@ -106,6 +123,60 @@ public class SlidePuzzle implements InputKeyControl{
 		canMove = true;
 		// sg.move(new Point(0, 0), new Point(-1, 0), true);
 		// print();
+		if (solved()) {
+			stopTimer();
+		}
+	}
+
+	public boolean solved ()
+	{
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (tiles[i][j] != i * width + j) return false;
+			}
+		}
+		return true;
+	}
+
+	public void startTimer ()
+	{
+		long m = System.currentTimeMillis();
+		Thread t = new Thread () {
+			public void run () {
+				while (true) {
+					// sets time to difference between start and current
+					sg.setTimer(toIntExact(System.currentTimeMillis() - m));
+					try {
+					    Thread.sleep(1);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+					if (stop) {
+						return;
+					}
+					// return;
+				}
+			}
+		};
+		t.start();
+	}
+
+	public void stopTimer ()
+	{
+		stop = true;
+	}
+
+	public void resetTimer ()
+	{
+		sg.setTimer(0);
+		stop = false;
+	}
+
+	public void reset ()
+	{
+		initTiles();
+		sg.reset();
+		resetTimer();
 	}
 
 	public void keyPress (String s)
@@ -113,7 +184,7 @@ public class SlidePuzzle implements InputKeyControl{
 		if (canMove) {
 			// new thread to allow the graphics to update
 			Thread t = new Thread() {
-				public void run() {
+				public void run () {
 					if (s.equalsIgnoreCase("w")) {
 						move(new Point(0, -1));
 					} else if (s.equalsIgnoreCase("s")) {
@@ -123,7 +194,7 @@ public class SlidePuzzle implements InputKeyControl{
 					} else if (s.equalsIgnoreCase("d")) {
 						move(new Point(1, 0));
 					}
-					interrupt();
+					// interrupt();
 				}
 			};
 			t.start();

@@ -5,7 +5,7 @@ public class SlidePuzzleGraphics {
 
 	private int animation = 12;
 	private int delay = 2;
-	private String colorScheme = "rainbow";
+	private String colorScheme = "pink-orange";
 
 	private int width, height;
 	private Rectangle[][] boxes;
@@ -15,6 +15,8 @@ public class SlidePuzzleGraphics {
 	private int borderWidth = 40;
 	private int borderThickness = borderWidth / 5;
 	private Rectangle background, outerBorder, innerBorder;
+
+	private Text timer;
 
 	public SlidePuzzleGraphics (int w, int h)
 	{
@@ -43,6 +45,19 @@ public class SlidePuzzleGraphics {
 		innerBorder.setColor(new Color(229, 229, 229));
 		innerBorder.fill();
 
+		initBoxes();
+
+		timer = new Text(0, 0, formatTime(0));
+		timer.grow(3, 3);
+		alignTimer(10);
+		timer.draw();
+		// boxes[height - 1][width - 1] = new Rectangle(0, 0, 0, 0);
+		// numbers[height - 1][width - 1] = new Text(0, 0, "");
+
+	}
+
+	public void initBoxes ()
+	{
 		boxes = new Rectangle[height][width];
 		numbers = new Text[height][width];
 
@@ -66,10 +81,6 @@ public class SlidePuzzleGraphics {
 				}
 			}
 		}
-
-		// boxes[height - 1][width - 1] = new Rectangle(0, 0, 0, 0);
-		// numbers[height - 1][width - 1] = new Text(0, 0, "");
-
 	}
 
 	public void move (int movedTileVal, Point vector, boolean draw)
@@ -104,10 +115,64 @@ public class SlidePuzzleGraphics {
 
 	public Color getColorScheme (int xPos, int yPos)
 	{
-		if (colorScheme.equals("flat")) {
-			return new Color(196, 196, 196);
+		double x = xPos, y = yPos;
+		switch (colorScheme) {
+			case "flat":
+				return new Color(196, 196, 196);
+			case "pink-orange":
+				// double sX = x / 2 + width / 4;
+				// double sY = y / 2 + height / 4;
+				double green = (x + (height - y)) / (height + width - 3) * 77 + 75;
+				double blue = (x + y) / (height + width - 3) * 107;
+				// System.out.println(green);
+				return new Color(248, (int) green, (int) blue);
 		}
 
 		return (xPos + yPos) % 2 == 0 ? new Color(253, 0, 255) : new Color(0, 0, 0);
+	}
+
+	public String formatTime (int milliseconds)
+	{
+		// int mT = milliseconds / (60 * 1000);
+		// String m =
+		// int sT = (milliseconds / 1000) % 60;
+		// int msT = milliseconds % 1000;
+		// return "" + m + ":" + s + "." + ms;
+		long millis = milliseconds % 1000;
+		long second = (milliseconds / 1000) % 60;
+		long minute = (milliseconds / (1000 * 60)) % 60;
+		// long hour = (milliseconds / (1000 * 60 * 60)) % 24;
+
+		return String.format("%02d:%02d.%03d", minute, second, millis);
+	}
+
+	public void alignTimer (double margin)
+	{
+		if (timer == null) return;
+
+		timer.translateNoRe(-timer.getX(), -timer.getY());
+		// top right
+		timer.translate(windowSize.getWidth() - timer.getWidth() - margin, margin);
+		// bottom right
+		// timer.translate(windowSize.getWidth() - timer.getWidth() - margin,  + windowSize.getHeight() - timer.getHeight() - margin);
+	}
+
+	public void setTimer (int milliseconds)
+	{
+		timer.setText(formatTime(milliseconds));
+		alignTimer(10);
+	}
+
+	public void reset ()
+	{
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (i != height - 1 || j != width - 1) {
+					boxes[i][j].undraw();
+					numbers[i][j].undraw();
+				}
+			}
+		}
+		initBoxes();
 	}
 }
