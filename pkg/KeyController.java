@@ -20,17 +20,17 @@ public class KeyController{
 			public void keyPressed(KeyEvent e) {
 				char cc = e.getKeyChar();
 				String c = Character.toString(cc);
-                iC.keyPress(c);
+                iC.keyPress(c, e);
             }
-			
+
 			public void keyReleased(KeyEvent e) {
 				char cc = e.getKeyChar();
 				String c = Character.toString(cc);
-                iC.keyRelease(c);
+                iC.keyRelease(c, e);
 			}
-			
+
 			public void keyTyped(KeyEvent e) {}
-            
+
         });
 
     }

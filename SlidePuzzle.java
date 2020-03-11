@@ -2,6 +2,8 @@ import pkg.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.lang.Thread;
+import java.util.Hashtable;
+import java.awt.event.KeyEvent;
 
 import static java.lang.Math.toIntExact;
 
@@ -13,8 +15,10 @@ public class SlidePuzzle implements InputKeyControl{
 	private SlidePuzzleGraphics sg;
 	private boolean canMove = true;
 	private boolean hasMoved = false;
-
 	private boolean stop = false;
+
+	private ConfigManager cm;
+	private Hashtable<String, String[]> movementKeys;
 
 	public SlidePuzzle (int w, int h)
 	{
@@ -22,6 +26,9 @@ public class SlidePuzzle implements InputKeyControl{
 		height = h;
 		initTiles();
 		sg = new SlidePuzzleGraphics(w, h);
+
+		cm = new ConfigManager("config.txt");
+		setKeys();
 
 		KeyController kC = new KeyController(Canvas.getInstance(), this);
 	}
@@ -182,19 +189,67 @@ public class SlidePuzzle implements InputKeyControl{
 		resetTimer();
 	}
 
-	public void keyPress (String s)
+	public void setKeys ()
 	{
+		movementKeys = cm.getMovementKeys();
+	}
+
+	public boolean matchesKey (String inputKey, String keyToMatch)
+	{
+		// System.out.println(inputKey + " " + keyToMatch);
+		if (!movementKeys.containsKey(keyToMatch)) return false;
+
+		String[] allKeys = movementKeys.get(keyToMatch);
+		for (String temp : allKeys) {
+			// System.out.println(inputKey + " " + temp);
+			// if (temp.equals("up")) temp = Character.toString((char) 38);
+			// if (temp.equals("down")) temp = Character.toString((char) 40);
+			// if (temp.equals("left")) temp = Character.toString((char) 37);
+			// if (temp.equals("right")) temp = Character.toString((char) 39);
+			if (inputKey.equals(temp)) return true;
+		}
+		return false;
+	}
+
+	public String formatArrowKey (String s, KeyEvent e)
+	{
+		String f;
+		int keyCode = e.getKeyCode();
+		// System.out.print(keyCode + " ");
+	    switch( keyCode ) {
+	        case KeyEvent.VK_UP:
+	            f = "up";
+	            break;
+	        case KeyEvent.VK_DOWN:
+	            f = "down";
+	            break;
+	        case KeyEvent.VK_LEFT:
+	            f = "left";
+	            break;
+	        case KeyEvent.VK_RIGHT :
+	            f = "right";
+	            break;
+			default:
+				f = s;
+	    }
+		// System.out.println(f);
+		return f;
+	}
+
+	public void keyPress (String s, KeyEvent e)
+	{
+		final String f = formatArrowKey(s, e);
 		if (canMove) {
 			// new thread to allow the graphics to update
 			Thread t = new Thread() {
 				public void run () {
-					if (s.equalsIgnoreCase("w")) {
+					if (matchesKey(f, "upKey")) {
 						move(new Point(0, -1));
-					} else if (s.equalsIgnoreCase("s")) {
+					} else if (matchesKey(f, "downKey")) {
 						move(new Point(0, 1));
-					} else if (s.equalsIgnoreCase("a")) {
+					} else if (matchesKey(f, "leftKey")) {
 						move(new Point(-1, 0));
-					} else if (s.equalsIgnoreCase("d")) {
+					} else if (matchesKey(f, "rightKey")) {
 						move(new Point(1, 0));
 					}
 					// interrupt();
@@ -204,7 +259,7 @@ public class SlidePuzzle implements InputKeyControl{
 		}
 	}
 
-	public void keyRelease (String s){}
+	public void keyRelease (String s, KeyEvent e){}
 
 	public void print ()
 	{

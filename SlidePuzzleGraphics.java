@@ -65,8 +65,8 @@ public class SlidePuzzleGraphics {
 			for (int j = 0; j < width; j++) {
 				if (i != height - 1 || j != width - 1) {
 					boxes[i][j] = new Rectangle(
-						innerBorder.getX() + j * innerBorder.getWidth() / width,
-						innerBorder.getY() + i * innerBorder.getHeight() / height,
+						innerBorder.getX() + j * innerBorder.getWidth() / (width * 1D),
+						innerBorder.getY() + i * innerBorder.getHeight() / (height * 1D),
 						innerBorder.getWidth() / (width * 1D),
 						innerBorder.getHeight() / (height * 1D)
 					);
@@ -75,6 +75,9 @@ public class SlidePuzzleGraphics {
 
 					numbers[i][j] = new Text(0, 0, "" + (i * width + j + 1));
 					numbers[i][j].grow(4, 4);
+					while (numbers[i][j].getHeight() > boxes[i][j].getHeight()) {
+						numbers[i][j].grow(0.5, 0.5);
+					}
 					numbers[i][j].center(boxes[i][j]);
 					numbers[i][j].setColor(new Color(43, 43, 43));
 					numbers[i][j].draw();
@@ -86,8 +89,8 @@ public class SlidePuzzleGraphics {
 	public void move (int movedTileVal, Point vector, boolean draw)
 	{
 		Point tileToMove = intToPoint(movedTileVal);
-		double xMove = vector.getX() * (innerBorder.getWidth() / (width * 1D)) / animation;
-		double yMove = vector.getY() * (innerBorder.getHeight() / (height * 1D)) / animation;
+		double xMove = vector.getX() * (innerBorder.getWidth() / (width * 1D)) / animation * 1D;
+		double yMove = vector.getY() * (innerBorder.getHeight() / (height * 1D)) / animation * 1D;
 		if (draw) {
 			for (int i = 0; i < animation; i++) {
 				// System.out.println(i);
@@ -125,7 +128,7 @@ public class SlidePuzzleGraphics {
 				double green = (x + (height - y)) / (height + width - 3) * 77 + 75;
 				double blue = (x + y) / (height + width - 3) * 107;
 				// System.out.println(green);
-				return new Color(248, (int) green, (int) blue);
+				return new Color(248, (int) green <= 255 ? (int) green : 255, (int) blue <= 255 ? (int) blue : 255);
 		}
 
 		return (xPos + yPos) % 2 == 0 ? new Color(253, 0, 255) : new Color(0, 0, 0);

@@ -1,3 +1,3 @@
-java -cp .; test
+java -cp .; Main
 pause
 

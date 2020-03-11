@@ -1,5 +1,6 @@
 import pkg.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
 
 public class Main implements InputControl, InputKeyControl{
 
@@ -12,6 +13,7 @@ public class Main implements InputControl, InputKeyControl{
 
 		sp = new SlidePuzzle(4, 4);
 		SlidePuzzleGraphics sg;
+		ConfigManager c = new ConfigManager("config.txt");
 		// s.print();
 		// s.move(new Point(0, -1));
 		Canvas.pause(2000);
@@ -35,13 +37,13 @@ public class Main implements InputControl, InputKeyControl{
 	public void onMouseEnter(double x, double y, MouseEvent e){}
 	public void onMouseExit(double x, double y, MouseEvent e){}
 	public void onMouseClick(double x, double y, MouseEvent e){}
-	public void keyPress(String s)
+	public void keyPress(String s, KeyEvent e)
 	{
 		if (s.equals("[")) {
 			sp.reset();
 		} else if (s.equals("]")) {
-			sp.shuffle(1000);
+			sp.shuffle(10000);
 		}
 	}
-	public void keyRelease(String s){}
+	public void keyRelease(String s, KeyEvent e){}
 }
