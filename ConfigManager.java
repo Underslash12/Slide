@@ -45,11 +45,13 @@ public class ConfigManager {
 		try {
 	      FileWriter configWriter = new FileWriter(configFilepath);
 	      configWriter.write(
-		  	"[seperate multiple keys with commas]\n" +
-		  	"upKey: w\n" +
-			"downKey: s\n" +
-			"leftKey: a\n" +
-			"rightKey: d\n"
+		  	"; Config file for the Slide Game\n\n" +
+			"; Keys for movement, separate with a comma\n" +
+		  	"[movement]\n" +
+		  	"up_key = w, up\n" +
+			"down_key = s, down\n" +
+			"left_key = a, left\n" +
+			"right_key = d, right\n"
 		  );
 	      configWriter.close();
 	  } catch (Exception e) {

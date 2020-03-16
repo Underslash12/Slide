@@ -1,5 +1,0 @@
-[seperate multiple keys with commas]
-upKey: w,up
-downKey: s,down
-leftKey: a,left
-rightKey: d,right
