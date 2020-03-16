@@ -1,4 +1,4 @@
-javac *.java
+javac -cp .;lib\* *.java
 pause
-java -cp .; Main
+java -cp .;lib\* Main
 pause

@@ -27,7 +27,7 @@ public class SlidePuzzle implements InputKeyControl{
 		initTiles();
 		sg = new SlidePuzzleGraphics(w, h);
 
-		cm = new ConfigManager("config.txt");
+		cm = new ConfigManager("config.ini");
 		setKeys();
 
 		KeyController kC = new KeyController(Canvas.getInstance(), this);
@@ -201,11 +201,6 @@ public class SlidePuzzle implements InputKeyControl{
 
 		String[] allKeys = movementKeys.get(keyToMatch);
 		for (String temp : allKeys) {
-			// System.out.println(inputKey + " " + temp);
-			// if (temp.equals("up")) temp = Character.toString((char) 38);
-			// if (temp.equals("down")) temp = Character.toString((char) 40);
-			// if (temp.equals("left")) temp = Character.toString((char) 37);
-			// if (temp.equals("right")) temp = Character.toString((char) 39);
 			if (inputKey.equals(temp)) return true;
 		}
 		return false;
@@ -243,15 +238,14 @@ public class SlidePuzzle implements InputKeyControl{
 			// new thread to allow the graphics to update
 			Thread t = new Thread() {
 				public void run () {
-					if (matchesKey(f, "upKey")) {
+					if (matchesKey(f, "up_key"))
 						move(new Point(0, -1));
-					} else if (matchesKey(f, "downKey")) {
+					else if (matchesKey(f, "down_key"))
 						move(new Point(0, 1));
-					} else if (matchesKey(f, "leftKey")) {
+					else if (matchesKey(f, "left_key"))
 						move(new Point(-1, 0));
-					} else if (matchesKey(f, "rightKey")) {
+					else if (matchesKey(f, "right_key"))
 						move(new Point(1, 0));
-					}
 					// interrupt();
 				}
 			};
