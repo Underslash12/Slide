@@ -5,7 +5,8 @@ public class SlidePuzzleGraphics {
 
 	private int animation = 12;
 	private int delay = 2;
-	private String colorScheme = "pink-orange";
+	private String colorScheme;
+	// private String colorScheme = "pink-orange";
 
 	private int width, height;
 	private Rectangle[][] boxes;
@@ -20,10 +21,11 @@ public class SlidePuzzleGraphics {
 
 	public SlidePuzzleGraphics (int w, int h)
 	{
+		windowSize = Canvas.getInstance().getSize();
+
 		width = w;
 		height = h;
-		windowSize = Canvas.getInstance().getSize();
-		initGraphics();
+		colorScheme = "none";
 	}
 
 	public void initGraphics ()
@@ -116,12 +118,31 @@ public class SlidePuzzleGraphics {
 		return new Point(x, y);
 	}
 
+	public void setColor (String s)
+	{
+		colorScheme = s;
+	}
+
 	public Color getColorScheme (int xPos, int yPos)
 	{
+		// default
+		if (colorScheme.equals("none")) {
+			return new Color(196, 196, 196);
+		}
+
+		// flat, hex codes
+		if (colorScheme.substring(0, 1).equals("#")) {
+			return new Color(
+			   Integer.valueOf(colorScheme.substring(1, 3), 16),
+			   Integer.valueOf(colorScheme.substring(3, 5), 16),
+			   Integer.valueOf(colorScheme.substring(5, 7), 16)
+			);
+		}
+
+		// pattern case
+		int normalized = yPos * width + xPos + 1;
 		double x = xPos, y = yPos;
 		switch (colorScheme) {
-			case "flat":
-				return new Color(196, 196, 196);
 			case "pink-orange":
 				// double sX = x / 2 + width / 4;
 				// double sY = y / 2 + height / 4;
@@ -129,8 +150,24 @@ public class SlidePuzzleGraphics {
 				double blue = (x + y) / (height + width - 3) * 107;
 				// System.out.println(green);
 				return new Color(248, (int) green <= 255 ? (int) green : 255, (int) blue <= 255 ? (int) blue : 255);
+			case "competetive-16":
+				switch (normalized) {
+					case 6:
+					case 10:
+					case 14:
+						return new Color(77, 98, 255);
+					case 7:
+					case 8:
+					case 11:
+					case 12:
+					case 15:
+						return new Color(246, 215, 54);
+					default:
+						return new Color(176, 19, 202);
+				}
 		}
 
+		// error case
 		return (xPos + yPos) % 2 == 0 ? new Color(253, 0, 255) : new Color(0, 0, 0);
 	}
 

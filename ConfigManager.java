@@ -2,14 +2,23 @@ import pkg.*;
 import org.ini4j.Ini;
 import org.ini4j.Wini;
 
+// import java.nio.file.Files;
+// import java.nio.file.Path;
+// import static java.nio.file.StandardCopyOption.*;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+
+import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import java.util.Scanner;
 import java.util.Hashtable;
 import java.util.Arrays;
 import java.util.ArrayList;
-
-import java.io.FileNotFoundException;
 
 public class ConfigManager {
 
@@ -28,36 +37,46 @@ public class ConfigManager {
 
 	public void assertConfig ()
 	{
-		File config = new File(configFilepath);
-		if (!config.exists()) {
+		File f = new File("/defaults/" + "config.ini");
+		System.out.println(f.length());
+		assertFile("config.ini");
+		assertFile("colors.txt");
+	}
+
+	public void assertFile (String filename)
+	{
+		File f = new File(filename);
+		if (!f.exists()) {
 			try {
-				config.createNewFile();
-				initEmpty();
-			} catch (Exception e) {
-				System.out.println("error");
-				e.printStackTrace();
+				f.createNewFile();
+				copy(getClass().getResourceAsStream("/defaults/" + filename), getCWD() + filename);
+			} catch (IOException ex) {
+				System.out.println("IO Error");
+				ex.printStackTrace();
 			}
 		}
 	}
 
-	public void initEmpty ()
+	public void copy (InputStream source, String dest)
 	{
+		System.out.println("Copying ->\n\t" + source + "\nto ->\n\t" + dest);
 		try {
-	      FileWriter configWriter = new FileWriter(configFilepath);
-	      configWriter.write(
-		  	"; Config file for the Slide Game\n\n" +
-			"; Keys for movement, separate with a comma\n" +
-		  	"[movement]\n" +
-		  	"up_key = w, up\n" +
-			"down_key = s, down\n" +
-			"left_key = a, left\n" +
-			"right_key = d, right\n"
-		  );
-	      configWriter.close();
-	  } catch (Exception e) {
-	      System.out.println("An error occurred.");
-	      e.printStackTrace();
-	    }
+			Files.copy(source, Paths.get(dest), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException ex){
+			System.out.println("IO Error");
+			ex.printStackTrace();
+		}
+	}
+
+	public String getCWD ()
+	{
+		String s = "Error";
+		try {
+			s = new File("").getAbsolutePath() + "\\";
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return s;
 	}
 
 	public void createConfigIni ()
@@ -89,5 +108,10 @@ public class ConfigManager {
 			all[i] = all[i].trim();
 		}
 		return all;
+	}
+
+	public String getColor ()
+	{
+		return configini.get("color-scheme", "color").trim();
 	}
 }

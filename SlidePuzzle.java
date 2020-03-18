@@ -22,13 +22,16 @@ public class SlidePuzzle implements InputKeyControl{
 
 	public SlidePuzzle (int w, int h)
 	{
+		cm = new ConfigManager("config.ini");
+		setKeys();
+
 		width = w;
 		height = h;
 		initTiles();
-		sg = new SlidePuzzleGraphics(w, h);
 
-		cm = new ConfigManager("config.ini");
-		setKeys();
+		sg = new SlidePuzzleGraphics(w, h);
+		setGraphicsColor();
+		sg.initGraphics();
 
 		KeyController kC = new KeyController(Canvas.getInstance(), this);
 	}
@@ -192,6 +195,11 @@ public class SlidePuzzle implements InputKeyControl{
 	public void setKeys ()
 	{
 		movementKeys = cm.getMovementKeys();
+	}
+
+	public void setGraphicsColor ()
+	{
+		sg.setColor(cm.getColor());
 	}
 
 	public boolean matchesKey (String inputKey, String keyToMatch)
